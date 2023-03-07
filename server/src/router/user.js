@@ -1,5 +1,6 @@
 const { loginAuth } = require('../controller/user.js')
 const { SuccessModel, ErrorModel } = require('../model/resModel.js')
+const redis = require('../database.redis.js')
 
 const getCookieExpires = () => {
     const d = new Date()
@@ -18,6 +19,8 @@ module.exports = (req, res) => {
                 // login successfully
                 req.session.username = data.username
                 req.session.realname = data.realname
+                // sync to redis
+                redis.set(req.sessionId, req.session)
                 return new SuccessModel(data, 'login successfully')
             }
             else {
